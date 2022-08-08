@@ -1,0 +1,18 @@
+.table th {
+    background-color: orange;
+}
+
+.label {
+    padding: 3px 10px;
+    color: white;
+    font-weight: 400;
+    border-radius: 5px;
+}
+
+.label-success {
+    background: #55c94b;
+}
+
+.label-danger {
+    background: #ed856d;
+}

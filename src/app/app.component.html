@@ -1,0 +1,80 @@
+<div class="container-fluid p-5">
+  <div class="card card-body">
+    <h3>Employee Table</h3>
+    <div class="row mt-3">
+      <div class="col-md-3">
+        <input type="text" class="form-control" [(ngModel)]="search"
+               (keyup)="getEmployees()" placeholder="Search by employee name"/>
+      </div>
+      <div class="col-md-2">
+        <select id="status" class="form-control" [(ngModel)]="status" (change)="getEmployees()">
+          <option value="All">All</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+        <label for="status"></label>
+      </div>
+      <div class="col-md-1 custom-drop-down">
+        <div class="d-inline-block" [autoClose]="'outside'" ngbDropdown>
+          <button class="btn btn-outline custom-select" ngbDropdownToggle>
+            <i class="fa fa-filter"></i>
+          </button>
+          <div ngbDropdownMenu>
+            <div *ngFor="let column of columnList; let i = index">
+              <div class="custom-control custom-checkbox">
+                <input id="checkbox{{i}}" type="checkbox" class="custom-control-input"
+                       [(ngModel)]="column.visible" (change)="persistColumnPreference()" value=""/>
+                <label for="checkbox{{i}}" class="custom-control-label">{{column.label}}</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <select id="itemsPerPage" class="form-control"
+                [(ngModel)]="itemsPerPage" (change)="getEmployees()">
+          <option value="5">5 Rows</option>
+          <option value="10">10 Rows</option>
+          <option value="20">20 Rows</option>
+        </select>
+        <label for="itemsPerPage"></label>
+      </div>
+      <div class="col-md-2 text-center">
+        <div class="btn-group" role="group">
+          <button class="btn btn-secondary"
+                  placement="top" ngbTooltip="Excel" (click)="downloadAsExcel()">
+            <i class="fa fa-file-excel-o"></i>
+          </button>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="table-responsive">
+          <table class="table table-hover" cdk-table [dataSource]="dataSource">
+            <ng-container cdkColumnDef="status">
+              <th cdk-header-cell *cdkHeaderCellDef>Status</th>
+              <td cdk-cell *cdkCellDef="let element">
+                <label class="label label-success" *ngIf="element.status === 'Active'">Active</label>
+                <label class="label label-danger" *ngIf="element.status === 'Inactive'">Inactive</label>
+              </td>
+            </ng-container>
+            <ng-container cdkColumnDef="name">
+              <th cdk-header-cell *cdkHeaderCellDef>Name</th>
+              <td cdk-cell *cdkCellDef="let element">{{element.employee_name}}</td>
+            </ng-container>
+            <ng-container cdkColumnDef="salary">
+              <th cdk-header-cell *cdkHeaderCellDef>Salary</th>
+              <td cdk-cell *cdkCellDef="let element">{{element.employee_salary}}</td>
+            </ng-container>
+            <ng-container cdkColumnDef="email">
+              <th cdk-header-cell *cdkHeaderCellDef>Email</th>
+              <td cdk-cell *cdkCellDef="let element">{{element.employee_email}}</td>
+            </ng-container>
+            <tr cdk-header-row *cdkHeaderRowDef="displayedColumns"></tr>
+            <tr cdk-row *cdkRowDef="let element; columns: displayedColumns"></tr>
+          </table>
+          <p *ngIf="(dataSource | async)?.length == 0" class="text-center">No Data Found</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
