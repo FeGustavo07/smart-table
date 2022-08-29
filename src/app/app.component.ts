@@ -3,6 +3,7 @@ import { EMPLOYEE_LIST, IEmployee } from './employee-meta-data';
 import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-root',
@@ -40,6 +41,8 @@ export class AppComponent implements OnInit{
 
   public form!: FormGroup;
 
+  ExcelData: any
+
   constructor(
     private fb: FormBuilder,
     private exportService: ExportService 
@@ -61,6 +64,21 @@ export class AppComponent implements OnInit{
     }
 
     this.getEmployees()
+  }
+
+  ReadExcel(event:any) {
+    let file = event.target.files[0]
+
+    let fileReader = new FileReader()
+    fileReader.readAsBinaryString(file)
+
+    fileReader.onload = (e)=>{
+      let workBook = XLSX.read(fileReader.result,{type:'binary'})
+      let sheetNames = workBook.SheetNames
+      this.ExcelData = XLSX.utils.sheet_to_json(workBook.Sheets[sheetNames[0]])
+      console.log(this.ExcelData)
+    
+    }
   }
 
   get displayedColumns() {
