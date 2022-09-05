@@ -1,5 +1,31 @@
 <div>
   <input type="file" (change)="ReadExcel($event)"/>
+  <!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  Launch demo modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #empregadosForm="ngForm" (ngSubmit)="criar(empregadosForm.value)">
+          <input type="text" name="nome" placeholder="nome" ngModel>
+          <input type="submit" value="submit">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 <div class="container-fluid p-5">
   <div class="card card-body">
@@ -53,24 +79,9 @@
       <div class="col-md-12">
         <div class="table-responsive">
           <table class="table table-hover" cdk-table [dataSource]="dataSource">
-            <ng-container cdkColumnDef="status">
-              <th cdk-header-cell *cdkHeaderCellDef>Status</th>
-              <td cdk-cell *cdkCellDef="let element">
-                <label class="label label-success" *ngIf="element.status === 'Active'">Active</label>
-                <label class="label label-danger" *ngIf="element.status === 'Inactive'">Inactive</label>
-              </td>
-            </ng-container>
-            <ng-container cdkColumnDef="name">
-              <th cdk-header-cell *cdkHeaderCellDef>Name</th>
-              <td cdk-cell *cdkCellDef="let element">{{element.employee_name}}</td>
-            </ng-container>
-            <ng-container cdkColumnDef="salary">
-              <th cdk-header-cell *cdkHeaderCellDef>Salary</th>
-              <td cdk-cell *cdkCellDef="let element">{{element.employee_salary}}</td>
-            </ng-container>
-            <ng-container cdkColumnDef="email">
-              <th cdk-header-cell *cdkHeaderCellDef>Email</th>
-              <td cdk-cell *cdkCellDef="let element">{{element.employee_email}}</td>
+            <ng-container cdkColumnDef="nome">
+              <th cdk-header-cell *cdkHeaderCellDef>nome</th>
+              <td cdk-cell *cdkCellDef="let element">{{element.nome}}</td>
             </ng-container>
             <tr cdk-header-row *cdkHeaderRowDef="displayedColumns"></tr>
             <tr cdk-row *cdkRowDef="let element; columns: displayedColumns"></tr>

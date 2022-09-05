@@ -1,7 +1,8 @@
+import { EmployeeService } from './shared/employee-service.service';
 import { ExportService } from './shared/export-service/export-service.service';
-import { EMPLOYEE_LIST, IEmployee } from './employee-meta-data';
+import { IEmployee } from './employee-meta-data';
 import { Component, OnInit } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, lastValueFrom } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as XLSX from 'xlsx';
 
@@ -16,14 +17,10 @@ export class AppComponent implements OnInit{
   readonly STORAGE_KEY = 'EMPLOYEE_TABLE';
 
   public columnList = [
-    {field: 'status', label: 'Status', visible: true},
-    {field: 'name', label: 'Name', visible: true},
-    {field: 'salary', label: 'Salary', visible: true},
-    {field: 'email', label: 'Email', visible: true},
+    {field: 'nome', label: 'Nome', visible: true},
     
   ];
 
-  public employeeList = EMPLOYEE_LIST
 
   public dataSource = new BehaviorSubject<IEmployee[]>([])
 
@@ -41,11 +38,15 @@ export class AppComponent implements OnInit{
 
   public form!: FormGroup;
 
+  public list: any[] = [];
+
   ExcelData: any
+  
 
   constructor(
     private fb: FormBuilder,
-    private exportService: ExportService 
+    private exportService: ExportService,
+    private employeeService: EmployeeService
   ) {}
 
   ngOnInit(): void {
@@ -87,32 +88,15 @@ export class AppComponent implements OnInit{
       .map(column => column.field)
   }
 
-  getEmployees(): void {
-    const items = this.employeeList
-      .sort((x, y) => {
-        if (x.id > y.id) {
-          return -1;
-        }
-        return 1;
-      })
-      .filter((employee: IEmployee) => {
-        let allowed = this.status === 'All' || employee.status === this.status
-
-      if (allowed && this.search) {
-        const matches = employee.employee_name.toLocaleUpperCase().match(this.search.toLocaleUpperCase())
-        return matches && matches.length > 0
-      }
-
-      return allowed
+  criar(empregado: {nome: string}) {
+    this.employeeService.adicionar(empregado).subscribe((res) => {
+      console.log(res)
     })
+  }
 
-    this.itemsCount = items.length
-    const noOfRowsToDisplay = items.slice(
-      this.itemsPerPage * (this.currentPage -1),
-      this.itemsPerPage * this.currentPage
-    )
-    this.dataSource.next(noOfRowsToDisplay)
-    this.formInit(noOfRowsToDisplay)
+  getEmployees(): void {
+    this.employeeService.obterTodos().subscribe(res => this.dataSource.next(res))
+    this.formInit(this.list)
   }
 
   persistColumnPreference(): void {
@@ -124,28 +108,11 @@ export class AppComponent implements OnInit{
       employeeList: this.fb.array(employeeList.map((employee: IEmployee) => {
         return this.fb.group({
           id: [employee.id],
-          status: [employee.status || '',
-            Validators.compose([
-              Validators.required
-            ])
-          ],
-          name: [employee.employee_name || '',
+          name: [employee.nome || '',
             Validators.compose([
               Validators.required,
-              Validators.maxLength(5),
+              Validators.minLength(1),
               Validators.maxLength(32)
-            ])
-          ],
-          salary: [employee.employee_salary || '',
-            Validators.compose([
-              Validators.required,
-              Validators.min(0),
-            ])
-          ],
-          email: [employee.employee_email || '',
-            Validators.compose([
-              Validators.required,
-              Validators.pattern(/^[_a-zA-Z0-9]+(\.[_a-zA-Z0-9]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,4})$/)
             ])
           ]
         })
@@ -162,10 +129,7 @@ export class AppComponent implements OnInit{
   getRowList() {
     return this.dataSource.value.map((employee: IEmployee) => {
       return {
-        status: employee.status,
-        name: employee.employee_name,
-        salary: employee.employee_salary,
-        email: employee.employee_email
+        nome: employee.nome
       };
     });
   }
